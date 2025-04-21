@@ -4,8 +4,8 @@
 update_version() {
     ECU_DIR=$1
     
-    # Extract the ECU ID using a more reliable method
-    ECU_ID=$(echo "$ECU_DIR" | grep -o -E 'ecu_[0-9]+' | cut -d'_' -f2)
+    # Extract the ECU ID more reliably using parameter expansion
+    ECU_ID=$(basename "$ECU_DIR" | sed -n 's/ecu_$$[0-9]\+$$.*/\1/p')
     
     if [ -z "$ECU_ID" ]; then
         echo "Could not extract ECU ID from directory name: $ECU_DIR"
@@ -14,10 +14,8 @@ update_version() {
     
     echo "Processing ECU ID: $ECU_ID from directory: $ECU_DIR"
     
-    # Find the container directory - be more flexible in finding it
-    # Look for any directory inside the ECU directory
-    CONTAINER_DIRS=$(find "./$ECU_DIR" -maxdepth 1 -type d -not -path "./$ECU_DIR")
-    CONTAINER_DIR=$(echo "$CONTAINER_DIRS" | head -1)
+    # Find the container directory more efficiently
+    CONTAINER_DIR=$(find "./$ECU_DIR" -maxdepth 1 -type d -not -name "$ECU_DIR" | head -1)
     
     if [ -z "$CONTAINER_DIR" ]; then
         echo "No container directory found in $ECU_DIR"
@@ -36,51 +34,30 @@ update_version() {
         return 1
     fi
     
-    # Get the current version from the manifest
-    CURRENT_VERSION=$(jq -r --arg ecuid "$ECU_ID" '.[] | select(.ecuid == $ecuid) | .version // "0.0"' mainfast.json)
-    echo "Current version in manifest: $CURRENT_VERSION"
-    
-    # Check if version has changed
-    if [ "$VERSION" = "$CURRENT_VERSION" ]; then
-        echo "Version unchanged for ECU ID: $ECU_ID"
-        VERSION_CHANGED=0
-    else
-        echo "Version changed for ECU ID: $ECU_ID: $CURRENT_VERSION -> $VERSION"
-        VERSION_CHANGED=1
-    fi
-    
     # Check for description.txt
     DESCRIPTION_FILE="$CONTAINER_DIR/description.txt"
     if [ -f "$DESCRIPTION_FILE" ]; then
         DESCRIPTION=$(cat "$DESCRIPTION_FILE")
         echo "Found description: $DESCRIPTION"
-        DESCRIPTION_CHANGED=1
     else
         # If no description file, keep the existing description
         DESCRIPTION=$(jq -r --arg ecuid "$ECU_ID" '.[] | select(.ecuid == $ecuid) | .description // "No description available"' mainfast.json)
         echo "No description.txt found, using existing description: $DESCRIPTION"
-        DESCRIPTION_CHANGED=0
     fi
     
-    # Only update if version or description has changed
-    if [ $VERSION_CHANGED -eq 1 ] || [ $DESCRIPTION_CHANGED -eq 1 ]; then
-        # Create a backup of the manifest file
-        cp mainfast.json mainfast.json.bak
-        
-        # Use jq to update the version and description in the mainfast.json file
-        jq --arg ecuid "$ECU_ID" --arg version "$VERSION" --arg desc "$DESCRIPTION" '
-            map(if .ecuid == $ecuid then 
-                .version = $version | 
-                if $desc != "" then .description = $desc else . end 
-            else . end)
-        ' mainfast.json > temp.json && mv temp.json mainfast.json
-        
-        echo "Updated mainfast.json for ECU ID: $ECU_ID"
-        return 0
-    else
-        echo "No changes needed for ECU ID: $ECU_ID"
-        return 1
-    fi
+    # Create a backup of the manifest file
+    cp mainfast.json mainfast.json.bak
+    
+    # Use jq to update the version and description in the mainfast.json file
+    jq --arg ecuid "$ECU_ID" --arg version "$VERSION" --arg desc "$DESCRIPTION" '
+        map(if .ecuid == $ecuid then 
+            .version = $version | 
+            if $desc != "" then .description = $desc else . end 
+        else . end)
+    ' mainfast.json > temp.json && mv temp.json mainfast.json
+    
+    echo "Updated mainfast.json for ECU ID: $ECU_ID"
+    return 0
 }
 
 # Check if mainfast.json exists before proceeding
@@ -113,12 +90,8 @@ else
 fi
 
 if [ $UPDATES_MADE -eq 1 ]; then
-    # Create a marker file to indicate changes were made
-    echo "true" > .manifest_updated
     echo "Manifest update completed with changes."
 else
-    # Create a marker file to indicate no changes were made
-    echo "false" > .manifest_updated
     echo "Manifest update completed. No changes were made."
 fi
 
