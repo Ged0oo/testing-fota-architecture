@@ -1,1 +1,1 @@
-This update handle new features like 1, 2, 3
+This update handle new features like lidar tracking
