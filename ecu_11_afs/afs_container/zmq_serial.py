@@ -4,7 +4,10 @@ import zmq
 import os
 
 
-# Test Jenkins
+## Add new Feauture ##
+# This script subscribes to a ZeroMQ publisher and sends the received messages to a serial port.
+# It expects messages in the format "r 90" or "l 45", where 'r' or 'l' indicates the direction
+
 
 print("Starting ZMQ Serial Subscriber...")
 # Read ZMQ publisher address from environment variable
