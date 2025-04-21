@@ -20,8 +20,8 @@
   {
     "ecuid": "11",
     "name": "afs",
-    "version": "2.2.1.3",
-    "description": "This update handle new features like Fota Subsystem"
+    "version": "2.2.9",
+    "description": "This update handle new features like"
   },
   {
     "ecuid": "12",

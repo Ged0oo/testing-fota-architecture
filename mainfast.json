@@ -2,7 +2,7 @@
   {
     "ecuid": "00",
     "name": "central",
-    "version": "1.1.2",
+    "version": "1.0",
     "description": "Centralized configuration for all services"
   },
   {
@@ -20,8 +20,8 @@
   {
     "ecuid": "11",
     "name": "afs",
-    "version": "2.2.5",
-    "description": "This update handle new features like Fota Subsystem"
+    "version": "2.2.9",
+    "description": "This update handle new features like"
   },
   {
     "ecuid": "12",

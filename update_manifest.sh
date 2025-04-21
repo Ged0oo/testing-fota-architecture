@@ -4,8 +4,12 @@
 update_version() {
     ECU_DIR=$1
     
-    # Extract the ECU ID more reliably using parameter expansion
-    ECU_ID=$(basename "$ECU_DIR" | sed -n 's/ecu_$$[0-9]\+$$.*/\1/p')
+    # Extract the ECU ID using a simpler approach with bash parameter expansion
+    DIR_NAME=$(basename "$ECU_DIR")
+    # Remove the "ecu_" prefix
+    ECU_ID_WITH_NAME=${DIR_NAME#ecu_}
+    # Extract just the numeric part
+    ECU_ID=$(echo "$ECU_ID_WITH_NAME" | cut -d '_' -f 1)
     
     if [ -z "$ECU_ID" ]; then
         echo "Could not extract ECU ID from directory name: $ECU_DIR"
