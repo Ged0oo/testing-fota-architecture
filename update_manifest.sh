@@ -1,30 +1,28 @@
 #!/bin/bash
 
-# Ensure an ECU ID is provided
-if [ -z "$1" ]; then
-    echo "No ECU ID provided!"
-    exit 1
-fi
+# Function to update the version in the manifest file for the given ECU directory
+update_version() {
+    ECU_ID=$1
+    ECU_DIR="./${ECU_ID}/afs_container"
+    VERSION_FILE="${ECU_DIR}/version.txt"
 
-ECU_ID=$1
-MANIFEST_FILE="mainfast.json"
-TEMP_FILE=$(mktemp)
+    if [ -f "$VERSION_FILE" ]; then
+        # Read version from version.txt
+        VERSION=$(cat "$VERSION_FILE")
+        # Update mainfast.json with the new version
+        jq --arg ecuid "$ECU_ID" --arg version "$VERSION" \
+            '(.[] | select(.ecuid == $ecuid) | .version) = $version' \
+            mainfast.json > temp.json && mv temp.json mainfast.json
+        echo "Version for ECU $ECU_ID updated to $VERSION in mainfast.json."
+    else
+        echo "Version file for $ECU_ID not found!"
+        exit 1
+    fi
+}
 
-# Extract current version of the ECU from the manifest
-current_version=$(jq --arg ecuId "$ECU_ID" '.[] | select(.ecuid == $ecuId) | .version' $MANIFEST_FILE)
-
-# Check if the ECU ID exists in the manifest
-if [ "$current_version" == "null" ]; then
-    echo "ECU ID $ECU_ID not found in $MANIFEST_FILE!"
-    exit 1
-fi
-
-# Read current version and increment it (assuming version format is X.Y)
-IFS='.' read -r major minor patch <<< "$current_version"
-new_version="$major.$((minor + 1))"  # Increment the minor version, no patch update
-
-# Update the version and description in the manifest file
-jq --arg ecuId "$ECU_ID" --arg newVersion "$new_version" \
-   'map(if .ecuid == $ecuId then .version = $newVersion else . end)' $MANIFEST_FILE > $TEMP_FILE && mv $TEMP_FILE $MANIFEST_FILE
-
-echo "Updated $ECU_ID version from $current_version to $new_version in $MANIFEST_FILE"
+# List all ECU directories and update the version in the manifest accordingly
+for dir in ecu_*; do
+    if [ -d "$dir" ]; then
+        update_version "$dir"
+    fi
+done
