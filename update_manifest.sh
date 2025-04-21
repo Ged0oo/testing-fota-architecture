@@ -5,7 +5,7 @@ update_version() {
     ECU_DIR=$1
     
     # Extract the ECU ID from the directory name (e.g., "ecu_00_central" -> "00")
-    ECU_ID=$(echo "$ECU_DIR" | sed -n 's/ecu_$$[0-9]*$$_.*/\1/p')
+    ECU_ID=$(echo "$ECU_DIR" | grep -o -E 'ecu_[0-9]+' | cut -d'_' -f2)
     
     if [ -z "$ECU_ID" ]; then
         echo "Could not extract ECU ID from directory name: $ECU_DIR"
