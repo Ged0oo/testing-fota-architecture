@@ -2,19 +2,19 @@
   {
     "ecuid": "00",
     "name": "central",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Centralized configuration for all services"
   },
   {
     "ecuid": "01",
     "name": "front",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Front configuration for all services"
   },
   {
     "ecuid": "02",
     "name": "rear",
-    "version": "1.0",
+    "version": "1.1",
     "description": "rear configuration for all services"
   },
   {
@@ -26,7 +26,7 @@
   {
     "ecuid": "12",
     "name": "motorcontrol",
-    "version": "1.0",
+    "version": "1.1",
     "description": "motorcontrol configuration for all services"
   }
 ]
