@@ -23,7 +23,7 @@ fi
 IFS='.' read -r major minor patch <<< "$current_version"
 new_version="$major.$((minor + 1))"  # Increment the minor version, no patch update
 
-# Update the version in the manifest file
+# Update the version and description in the manifest file
 jq --arg ecuId "$ECU_ID" --arg newVersion "$new_version" \
    'map(if .ecuid == $ecuId then .version = $newVersion else . end)' $MANIFEST_FILE > $TEMP_FILE && mv $TEMP_FILE $MANIFEST_FILE
 
