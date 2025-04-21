@@ -1,0 +1,11 @@
+services:
+  zmq-serial-sub:
+    build: .
+    container_name: zmq-serial-sub
+    privileged: true
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    environment:
+      - ZMC_HOST=tcp://192.168.1.18:5555
+    working_dir: /app
+    command: ["python3", "/app/zmq_serial.py"]
