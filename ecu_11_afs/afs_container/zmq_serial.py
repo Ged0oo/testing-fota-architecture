@@ -3,6 +3,11 @@ import time
 import zmq
 import os
 
+# This script subscribes to a ZeroMQ publisher and sends the received messages to a serial port.
+# It expects messages in the format "r 90" or "l 45", where 'r' or 'l' indicates the direction and the number is the angle.
+# The script will send the direction and angle to the serial port for further processing.
+# Ensure you have the required libraries installed:
+
 print("Starting ZMQ Serial Subscriber...")
 # Read ZMQ publisher address from environment variable
 ZMC_HOST = os.getenv("ZMC_HOST", "tcp://192.168.1.18:5555")

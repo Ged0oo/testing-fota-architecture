@@ -20,8 +20,8 @@
   {
     "ecuid": "11",
     "name": "afs",
-    "version": "1.4",
-    "description": "This update handle new features like lidar tracking"
+    "version": "2.3",
+    "description": "This update handle new features like Fota Subsystem"
   },
   {
     "ecuid": "12",
