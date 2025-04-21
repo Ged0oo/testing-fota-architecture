@@ -4,8 +4,8 @@
 update_version() {
     ECU_DIR=$1
     
-    # Extract the ECU ID more reliably using parameter expansion
-    ECU_ID=$(basename "$ECU_DIR" | sed -n 's/ecu_$$[0-9]\+$$.*/\1/p')
+    # Extract the ECU ID using a more reliable method
+    ECU_ID=$(echo "$ECU_DIR" | grep -o -E 'ecu_[0-9]+' | cut -d'_' -f2)
     
     if [ -z "$ECU_ID" ]; then
         echo "Could not extract ECU ID from directory name: $ECU_DIR"
@@ -15,7 +15,7 @@ update_version() {
     echo "Processing ECU ID: $ECU_ID from directory: $ECU_DIR"
     
     # Find the container directory more efficiently
-    CONTAINER_DIR=$(find "./$ECU_DIR" -maxdepth 1 -type d -not -name "$ECU_DIR" | head -1)
+    CONTAINER_DIR=$(find "./$ECU_DIR" -maxdepth 1 -type d -not -path "./$ECU_DIR" | head -1)
     
     if [ -z "$CONTAINER_DIR" ]; then
         echo "No container directory found in $ECU_DIR"
