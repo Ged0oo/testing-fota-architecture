@@ -16,7 +16,7 @@
         "name": "rear",
         "version": "1.0",
         "description": "rear configuration for all services"
-    }
+    },
     {
         "ecuid": "11",
         "name": "afs",
